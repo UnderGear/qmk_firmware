@@ -1,6 +1,5 @@
 /*
 Copyright 2012 Jun Wako <wakojun@gmail.com>
-Copyright 2015 Jack Humbert
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,30 +15,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
 
-#include "config_common.h"
+#define USE_SERIAL
 
-
-#define PRODUCT         Dactyl-Manuform (6x6)
-
-/* key matrix size */
+#define MASTER_LEFT
+//#define MASTER_RIGHT
+//#define EE_HANDS
 // Rows are doubled-up
-#define MATRIX_ROWS 14
-#define MATRIX_COLS 6
-
-// wiring of each half
-// I reversed the columns when wiring the left side
-//#define MATRIX_COL_PINS { D4, C6, D7, E6, B4, B5 }
-#define MATRIX_COL_PINS { B5, B4, E6, D7, C6, D4 }
-#define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2, B6 }
-
-// switched from COL2ROW for my amoeba PCBs
-#define DIODE_DIRECTION ROW2COL
-
-// WS2812 RGB LED strip input and number of LEDs
-#define RGB_DI_PIN D3
-#define RGBLED_NUM 38
-
-//https://beta.docs.qmk.fm/using-qmk/hardware-features/lighting/feature_rgblight
