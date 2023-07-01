@@ -8,8 +8,15 @@ CONSOLE_ENABLE = no         # Console for debug
 COMMAND_ENABLE = yes        # Commands for debug and configuration
 NKRO_ENABLE = no            # Enable N-Key Rollover
 BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
-RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
+MIDI_ENABLE = no
 AUDIO_ENABLE = no           # Audio output
+UNICODE_ENABLE = no
+BLUETOOTH_ENABLE = no
+RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
+RGB_MATRIX_ENABLE = no
+RGB_MATRIX_DRIVER = WS2812
 SPLIT_KEYBOARD = yes
+
+SLEEP_LED_ENABLE = no
 
 DEFAULT_FOLDER = handwired/dactyl_manuform/6x6/promicro
