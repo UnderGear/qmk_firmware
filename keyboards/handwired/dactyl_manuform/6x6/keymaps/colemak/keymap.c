@@ -9,6 +9,12 @@
 #define LOWER MO(_LOWER)
 #define DEFAULT MO(_DEFAULT)
 
+enum custom_keycodes {
+    KC_PRWD = SAFE_RANGE,
+    KC_NXWD,
+    KC_DLIN
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_DEFAULT] = LAYOUT_6x6(
@@ -41,9 +47,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
        _______,_______,_______,_______,_______,_______,                      _______,_______,_______,_______,_______,_______,
        _______,_______,_______,_______,_______,_______,                      _______,_______,_______,_______,_______,_______,
-       _______,_______,KC_HOME, KC_UP , KC_END,_______,                      _______,KC_MUTE,KC_VOLU,KC_MSTP,_______,_______,
-       _______,_______,KC_LEFT,KC_DOWN,KC_RGHT,_______,                      _______,KC_MPRV,KC_MPLY,KC_MNXT,_______,_______,
-       _______,KC_UNDO,KC_CUT ,KC_COPY,KC_PSTE,_______,                      _______,_______,KC_VOLD,_______,_______,_______,
+       KC_PGUP,_______,KC_HOME, KC_UP , KC_END,_______,                      _______,KC_MUTE,KC_VOLU,KC_MSTP,_______,_______,
+       KC_PGDN,KC_PRWD,KC_LEFT,KC_DOWN,KC_RGHT,KC_NXWD,                      _______,KC_MPRV,KC_MPLY,KC_MNXT,_______,_______,
+       _______,KC_UNDO,KC_CUT ,KC_COPY,KC_PSTE,KC_DLIN,                      _______,_______,KC_VOLD,_______,_______,_______,
                        _______,_______,                                                      _______,_______,
                                        _______,_______,                      _______,_______,
                                                _______,_______,      _______,_______,
@@ -51,3 +57,94 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case KC_PRWD:
+            if (record->event.pressed) {
+                if (keymap_config.swap_lctl_lgui) {
+                    register_mods(mod_config(MOD_LALT));
+                    register_code(KC_LEFT);
+                } else {
+                    register_mods(mod_config(MOD_LCTL));
+                    register_code(KC_LEFT);
+                }
+            } else {
+                if (keymap_config.swap_lctl_lgui) {
+                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_code(KC_LEFT);
+                } else {
+                    unregister_mods(mod_config(MOD_LCTL));
+                    unregister_code(KC_LEFT);
+                }
+            }
+            break;
+        case KC_NXWD:
+             if (record->event.pressed) {
+                if (keymap_config.swap_lctl_lgui) {
+                    register_mods(mod_config(MOD_LALT));
+                    register_code(KC_RIGHT);
+                } else {
+                    register_mods(mod_config(MOD_LCTL));
+                    register_code(KC_RIGHT);
+                }
+            } else {
+                if (keymap_config.swap_lctl_lgui) {
+                    unregister_mods(mod_config(MOD_LALT));
+                    unregister_code(KC_RIGHT);
+                } else {
+                    unregister_mods(mod_config(MOD_LCTL));
+                    unregister_code(KC_RIGHT);
+                }
+            }
+            break;
+        case KC_DLIN:
+            if (record->event.pressed) {
+                register_mods(mod_config(MOD_LCTL));
+                register_code(KC_BSPC);
+            } else {
+                unregister_mods(mod_config(MOD_LCTL));
+                unregister_code(KC_BSPC);
+            }
+            break;
+        case KC_COPY:
+            if (record->event.pressed) {
+                register_mods(mod_config(MOD_LCTL));
+                register_code(KC_C);
+            } else {
+                unregister_mods(mod_config(MOD_LCTL));
+                unregister_code(KC_C);
+            }
+            return false;
+        case KC_PASTE:
+            if (record->event.pressed) {
+                register_mods(mod_config(MOD_LCTL));
+                register_code(KC_V);
+            } else {
+                unregister_mods(mod_config(MOD_LCTL));
+                unregister_code(KC_V);
+            }
+            return false;
+        case KC_CUT:
+            if (record->event.pressed) {
+                register_mods(mod_config(MOD_LCTL));
+                register_code(KC_X);
+            } else {
+                unregister_mods(mod_config(MOD_LCTL));
+                unregister_code(KC_X);
+            }
+            return false;
+            break;
+        case KC_UNDO:
+            if (record->event.pressed) {
+                register_mods(mod_config(MOD_LCTL));
+                register_code(KC_Z);
+            } else {
+                unregister_mods(mod_config(MOD_LCTL));
+                unregister_code(KC_Z);
+            }
+            return false;
+    }
+    return true;
+}
+
