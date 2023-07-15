@@ -139,11 +139,15 @@ bool oled_task_user(void) {
 
 #endif
 
-void update_code_state(bool is_code_pressed) {
+bool is_code_pressed = false;
+bool is_code_toggled = false;
+
+void update_code_state(void) {
 
   bool current_code_state = layer_state_is(_CODE);
+  bool desired_code_state = is_code_pressed != is_code_toggled;
 
-  if (is_code_pressed != current_code_state) {
+  if (desired_code_state != current_code_state) {
     if (current_code_state) {
       layer_off(_CODE);
     }
@@ -153,28 +157,17 @@ void update_code_state(bool is_code_pressed) {
   }
 }
 
-void toggle_code(void) {
-  if (is_code_pressed) {
-    return;
-  }
-
-  if (layer_state_is(_CODE)) {
-    layer_off(_CODE);
-  }
-  else {
-    layer_on(_CODE);
-  }
-}
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case KC_CODE:
-            update_code_state(record->event.pressed);
-            return false;
+          is_code_pressed = record->event.pressed;
+          update_code_state();
+          return false;
         case KC_CTGL:
-            if (record->event.pressed) {
-                toggle_code();
-            }
+          if (record->event.pressed) {
+            is_code_toggled = !is_code_toggled;
+            update_code_state();
+          }
           return false;
     }
     return true;
