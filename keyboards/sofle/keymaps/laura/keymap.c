@@ -94,30 +94,28 @@ static void print_status_narrow(void) {
     oled_write_P(PSTR("\n\n"), false);
     oled_write_ln_P(PSTR("Laura\nDell"), false);
 
-    oled_write_ln_P(PSTR(""), false);
+    oled_write_P(PSTR("\n\n\n"), false);
 
-    oled_write_P(PSTR("\n\n"), false);
-    // Print current layer
-    oled_write_ln_P(PSTR("LAYER"), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("Base"), false);
-            break;
-        case _CODE:
-            oled_write_ln_P(PSTR("Code"), false);
-            break;
-        default:
-            oled_write_ln_P(PSTR("Undef"), false);
+    // Print state info
+    int extra_lines = 0;
+    if (get_highest_layer(layer_state) == _CODE) {
+      oled_write_ln_P(PSTR("CODE"), false);
     }
-
-    oled_write_P(PSTR("\n\n"), false);
+    else {
+      ++extra_lines;
+    }
 
     led_t led_usb_state = host_keyboard_led_state();
     if (led_usb_state.caps_lock) {
       oled_write_ln_P(PSTR("CAPS"), false);
     }
     else {
-      oled_write_ln_P(PSTR(""), false); // we have to overwrite this line in a buffer I guess?
+      ++extra_lines;
+    }
+
+    // we have to overwrite these lines in a buffer I guess
+    for (int i = 0; i < extra_lines; ++i) {
+      oled_write_ln_P(PSTR(""), false);
     }
 }
 
