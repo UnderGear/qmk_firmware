@@ -1,7 +1,7 @@
 {
-    "manufacturer": "Brian Low",
+    "manufacturer": "Xian",
     "keyboard_name": "Sofle Choc",
-    "maintainer": "Brian Low <github@brianlow.com>",
+    "maintainer": "Christian Dell <christian.dell1@gmail.com.com>",
     "build": {
         "lto": true
     },
@@ -129,7 +129,6 @@
             }
         }
     },
-    "url": "https://github.com/josefadamcik/SofleKeyboard",
     "usb": {
         "device_version": "0.0.1",
         "pid": "0x5343",
