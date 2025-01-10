@@ -74,6 +74,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+void keyboard_post_init_user(void) {
+  rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_OUT_IN);
+  rgb_matrix_set_speed_noeeprom(45);
+}
+
 
 
 #ifdef OLED_ENABLE
