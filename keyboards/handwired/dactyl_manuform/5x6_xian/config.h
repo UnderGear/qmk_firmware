@@ -18,15 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-//#define SPLIT_TRANSPORT_MIRROR
-#define USE_I2C
-
 #define SPLIT_LAYER_STATE_ENABLE
+#define SPLIT_LED_STATE_ENABLE
+#define SPLIT_TRANSPORT_MIRROR
 
 #define EE_HANDS
 #define RGB_MATRIX_SLEEP
 #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 255
-#define RGB_MATRIX_CENTER { 127, 67 }
+#define RGB_MATRIX_CENTER { 127, 67 } //TODO: revert to default. adjust our RGB matrix positions to max x: 224, y: 64
 
 #define LTO_ENABLE
 

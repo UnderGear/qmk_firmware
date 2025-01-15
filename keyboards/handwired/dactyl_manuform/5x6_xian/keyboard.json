@@ -13,7 +13,8 @@
         "split_count": [32, 32],
         "animations": {
             "solid_color": true,
-            "solid_reactive_simple": true
+            "solid_reactive_simple": true,
+            "cycle_out_in": true
         },
         "layout": [
 
@@ -118,12 +119,6 @@
         "mousekey": true,
         "nkro": false
     },
-    "qmk": {
-        "locking": {
-            "enabled": true,
-            "resync": true
-        }
-    },
     "matrix_pins": {
         "cols": ["B6", "B2", "B3", "B1", "F7", "F6"],
         "rows": ["B4", "E6", "D7", "C6", "D4", "B5"]
@@ -131,7 +126,7 @@
     "diode_direction": "COL2ROW",
     "split": {
         "enabled": true,
-        "soft_serial_pin": "D0"
+        "soft_serial_pin": "D2"
     },
     "processor": "atmega32u4",
     "bootloader": "atmel-dfu",

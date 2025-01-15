@@ -12,7 +12,18 @@ enum custom_keycodes
 {
     KC_PRWD = SAFE_RANGE,
     KC_NXWD,
-    KC_DLIN
+    KC_DLIN,
+    RM_RSET,
+    RM_SPUE,
+    RM_SPDE,
+    RM_HUUE,
+    RM_HUDE,
+    RM_SAUE,
+    RM_SADE,
+    RM_VAUE,
+    RM_VADE,
+    RM_PRVE,
+    RM_NXTE
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
@@ -30,12 +41,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
                                             KC_LALT,KC_ESC ,        KC_RGUI,KC_ENT
   ),
 
-  [_LOWER] = LAYOUT_5x6( //right hand is a numpad
+  [_LOWER] = LAYOUT_5x6( //right hand is a numpad, left hand modifies RGB matrix
 
     XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_CIRC,KC_PERC,KC_PSLS,KC_PAST,KC_PEQL,KC_LABK,
-    XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_PIPE, KC_P7 , KC_P8 , KC_P9 ,KC_PMNS,KC_RABK,
-    XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_AMPR, KC_P4 , KC_P5 , KC_P6 ,KC_PPLS,KC_LPRN,
-    XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_EXLM, KC_P1 , KC_P2 , KC_P3 ,KC_PENT,KC_RPRN,
+    XXXXXXX,RM_SPUE,RM_HUUE,RM_SAUE,RM_VAUE,XXXXXXX,                        KC_PIPE, KC_P7 , KC_P8 , KC_P9 ,KC_PMNS,KC_RABK,
+    XXXXXXX,RM_SPDE,RM_HUDE,RM_SADE,RM_VADE,XXXXXXX,                        KC_AMPR, KC_P4 , KC_P5 , KC_P6 ,KC_PPLS,KC_LPRN,
+    XXXXXXX,RM_RSET,RM_TOGG,RM_PRVE,RM_NXTE,XXXXXXX,                        KC_EXLM, KC_P1 , KC_P2 , KC_P3 ,KC_PENT,KC_RPRN,
                     XXXXXXX,XXXXXXX,                                                         KC_P0 ,KC_PDOT, 
                                     XXXXXXX,XXXXXXX,                        XXXXXXX,_______,
                                             XXXXXXX,XXXXXXX,        XXXXXXX,XXXXXXX,
@@ -54,6 +65,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
                                             XXXXXXX,XXXXXXX,      XXXXXXX,XXXXXXX
   )
 };
+
+void rgb_reset(void)
+{
+    rgb_matrix_mode(RGB_MATRIX_SOLID_REACTIVE_SIMPLE);
+    rgb_matrix_set_speed(45);
+    rgb_matrix_sethsv(HSV_RED);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
@@ -176,76 +194,148 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
                 unregister_code(KC_Z);
             }
             return false;
+        case RM_RSET:
+            if (record->event.pressed)
+            {
+                rgb_reset();
+            }
+            return false;
+        case RM_SPUE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_increase_speed();
+            }
+            return false;
+        case RM_SPDE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_decrease_speed();
+            }
+            return false;
+        case RM_HUUE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_increase_hue();
+            }
+            return false;
+        case RM_HUDE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_decrease_hue();
+            }
+            return false;
+        case RM_SAUE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_increase_sat();
+            }
+            return false;
+        case RM_SADE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_decrease_sat();
+            }
+            return false;
+        case RM_VAUE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_increase_val();
+            }
+            return false;
+        case RM_VADE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_decrease_val();
+            }
+            return false;
+        case RM_PRVE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_step_reverse();
+            }
+            return false;
+        case RM_NXTE:
+            if (record->event.pressed)
+            {
+                rgb_matrix_step();
+            }
+            return false;
     }
     return true;
 }
 
-void keyboard_post_init_user(void)
-{
-    //rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_REACTIVE_SIMPLE);
-    rgb_matrix_set_speed_noeeprom(45);
-    rgb_matrix_sethsv_noeeprom(HSV_RED);
-}
-
 #ifdef OLED_ENABLE
 
-static void render_logo(void)
+static void print_layer_status(void)
 {
-    static const char PROGMEM qmk_logo[] =
-    {
-        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94,
-        0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4,
-        0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0x00
-    };
+    oled_write_ln_P(PSTR("Xian"), false);
+    oled_write_ln_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR("\n"), false);
 
-    oled_write_P(qmk_logo, false);
+    oled_write_ln_P(PSTR("Layer"), false);
+
+    if (IS_LAYER_ON(_DEFAULT))
+    {
+        oled_write_ln_P(PSTR("Main"), false);
+    }
+    else if (IS_LAYER_ON(_RAISE))
+    {
+        oled_write_ln_P(PSTR("Raise"), false);
+    }
+    else if (IS_LAYER_ON(_LOWER))
+    {
+        oled_write_ln_P(PSTR("Lower"), false);
+    }
 }
 
-static void print_status_narrow(void)
+static void print_rgb_status(void)
 {
-    oled_write_P(PSTR("\n\n"), false);
-    oled_write_ln_P(PSTR("Xian"), false);
+    oled_write_P(PSTR("H "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_hue(), ' '), false);
 
-    oled_write_P(PSTR("\n\n\n"), false);
+    oled_write_P(PSTR("S "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_sat(), ' '), false);
 
-    // Print state info
-    int extra_lines = 0;
-    led_t led_usb_state = host_keyboard_led_state();
-    if (led_usb_state.caps_lock)
-    {
-      oled_write_ln_P(PSTR("CAPS"), false);
-    }
-    else
-    {
-      ++extra_lines;
-    }
+    oled_write_P(PSTR("V "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_val(), ' '), false);
 
-    // we have to overwrite these lines in a buffer I guess
-    for (int i = 0; i < extra_lines; ++i)
+    oled_write_ln_P(PSTR("\n"), false);
+    oled_write_ln_P(PSTR("Speed"), false);
+    oled_write_P(PSTR("  "), false); //align speed value to the right of the OLED
+    oled_write_ln(get_u8_str(rgb_matrix_get_speed(), ' '), false);
+
+    oled_write_ln_P(PSTR("Mode"), false);
+    switch (rgb_matrix_get_mode())
     {
-      oled_write_ln_P(PSTR(""), false);
+        case 1:
+            oled_write_ln_P(PSTR("Solid"), false);
+            break;
+        case 2:
+            oled_write_ln_P(PSTR("Cycle"), false);
+            break;
+        case 3:
+            oled_write_ln_P(PSTR("React"), false);
+            break;
     }
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation)
 {
-    if (is_keyboard_master())
-    {
-        return OLED_ROTATION_270;
-    }
-    return rotation;
+    return OLED_ROTATION_270;
 }
 
 bool oled_task_user(void)
 {
     if (is_keyboard_master())
     {
-        print_status_narrow();
+        print_layer_status();
     }
     else
     {
-        render_logo();
+        print_rgb_status();
     }
     return false;
 }
