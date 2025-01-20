@@ -308,17 +308,24 @@ static void print_rgb_status(void)
     oled_write_ln(get_u8_str(rgb_matrix_get_speed(), ' '), false);
 
     oled_write_ln_P(PSTR("Mode"), false);
-    switch (rgb_matrix_get_mode())
+    if (rgb_matrix_is_enabled())
     {
-        case 1:
-            oled_write_ln_P(PSTR("Solid"), false);
-            break;
-        case 2:
-            oled_write_ln_P(PSTR("Cycle"), false);
-            break;
-        case 3:
-            oled_write_ln_P(PSTR("React"), false);
-            break;
+        switch (rgb_matrix_get_mode())
+        {
+            case 1:
+                oled_write_ln_P(PSTR("Solid"), false);
+                break;
+            case 2:
+                oled_write_ln_P(PSTR("Cycle"), false);
+                break;
+            case 3:
+                oled_write_ln_P(PSTR("React"), false);
+                break;
+        }
+    }
+    else
+    {
+        oled_write_ln_P(PSTR("Off"), false);
     }
 }
 
