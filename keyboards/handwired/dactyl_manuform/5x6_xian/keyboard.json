@@ -106,7 +106,7 @@
         "pin": "D3"
     },
     "features": {
-        "bootmagic": false,
+        "bootmagic": true,
         "oled": true,
         "rgb_matrix": true,
         "command": false,
