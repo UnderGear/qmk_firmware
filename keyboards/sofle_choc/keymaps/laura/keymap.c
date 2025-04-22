@@ -11,7 +11,17 @@ enum custom_keycodes {
     KC_QWERTY = SAFE_RANGE,
     KC_CODE,
     KC_CTGL, // code toggle
-    KC_D_MUTE
+    KC_RGBS
+};
+
+enum rgb_encoder_selection {
+    EN_HUE = 0,
+    EN_SAT,
+    EN_VAL,
+    EN_SPEED,
+    EN_MODE,
+    EN_ENABLE,
+    EN_COUNT
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -23,7 +33,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * | TAB  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  |  =   |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | CAPS |   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |  '   |
- * |------+------+------+------+------+------| PLAY  |    |  N/A  |------+------+------+------+------+------|
+ * |------+------+------+------+------+------| PLAY  |    |  RGB  |------+------+------+------+------+------|
  * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RShift|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *            | WIN  | ALT  | CTRL |Space | / CODE  /       \ CTGL \  |Enter | BSPC |  [   |  ]   |
@@ -38,7 +48,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+-------+-------+-------+-------+-------|                   |-------+-------+-------+-------+-------+-------|
      KC_CAPS, KC_A  , KC_S  , KC_D  , KC_F  , KC_G  ,                     KC_H  , KC_J  , KC_K  , KC_L  ,KC_SCLN,KC_QUOT,
   //|-------+-------+-------+-------+-------+-------|  ===  |   |  ===  |-------+-------+-------+-------+-------+-------|
-     KC_LSFT, KC_Z  , KC_X  , KC_C  , KC_V  , KC_B  ,KC_MPLY,    XXXXXXX, KC_N  , KC_M  ,KC_COMM,KC_DOT ,KC_SLSH,KC_RSFT,
+     KC_LSFT, KC_Z  , KC_X  , KC_C  , KC_V  , KC_B  ,KC_MPLY,    KC_RGBS, KC_N  , KC_M  ,KC_COMM,KC_DOT ,KC_SLSH,KC_RSFT,
   //|-------+-------+-------+-------+-------+-------|  ===  |   |  ===  |-------+-------+-------+-------+-------+-------|
                      KC_LCTL,KC_LALT,KC_LGUI,KC_SPC ,KC_CODE,    KC_CTGL,KC_ENT ,KC_BSPC,KC_LBRC,KC_RBRC
   //                \-------+-------+-------+-------+-------|   |-------+-------+-------+-------+-------/
@@ -74,23 +84,54 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
-void keyboard_post_init_user(void) {
-  rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_OUT_IN);
-  rgb_matrix_set_speed_noeeprom(45);
-}
-
-
+rgb_encoder_selection current_selection = EN_HUE;
 
 #ifdef OLED_ENABLE
 
-static void render_logo(void) {
-    static const char PROGMEM qmk_logo[] = {
-        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94,
-        0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4,
-        0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0x00
-    };
+static void render_rgb_status(void) {
+    oled_write_P(PSTR("H "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_hue(), ' '), false);
 
-    oled_write_P(qmk_logo, false);
+    oled_write_P(PSTR("S "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_sat(), ' '), false);
+
+    oled_write_P(PSTR("V "), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_val(), ' '), false);
+
+    oled_write_P(PSTR("Sp"), false);
+    oled_write_ln(get_u8_str(rgb_matrix_get_speed(), ' '), false);
+
+    oled_write_P(PSTR("M "), false);
+    if (rgb_matrix_is_enabled())
+    {
+        oled_write_ln(get_u8_str(rgb_matrix_get_mode(), ' '), false);
+    }
+    else
+    {
+        oled_write_ln_P(PSTR("Off"), false);
+    }
+
+    oled_write_ln_P(PSTR("Edit"), false);
+    switch (current_selection) {
+    case EN_HUE:
+      oled_write_ln_P(PSTR("Hue"), false);
+      break;
+    case EN_SAT:
+      oled_write_ln_P(PSTR("Sat"), false);
+      break;
+    case EN_VAL:
+      oled_write_ln_P(PSTR("Val"), false);
+      break;
+    case EN_SPEED:
+      oled_write_ln_P(PSTR("Speed"), false);
+      break;
+    case EN_MODE:
+      oled_write_ln_P(PSTR("Mode"), false);
+      break;
+    case EN_ENABLE:
+      oled_write_ln_P(PSTR("OnOff"), false);
+      break;
+    }
 }
 
 static void print_status_narrow(void) {
@@ -134,7 +175,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         print_status_narrow();
     } else {
-        render_logo();
+        render_rgb_status();
     }
     return false;
 }
@@ -171,14 +212,76 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             update_code_state();
           }
           return false;
+        case KC_RGBS:
+          if (record->event.pressed) {
+            // toggle through selected rgb parameter
+            ++current_selection;
+            current_selection %= EN_COUNT;
+          }
+          return false;
     }
     return true;
 }
 
+void encoder_rgb_up(void) {
+  switch (current_selection) {
+    case EN_HUE:
+      rgb_matrix_increase_hue();
+      break;
+    case EN_SAT:
+      rgb_matrix_increase_sat();
+      break;
+    case EN_VAL:
+      rgb_matrix_increase_val();
+      break;
+    case EN_SPEED:
+      rgb_matrix_increase_speed();
+      break;
+    case EN_MODE:
+      rgb_matrix_step();
+      break;
+    case EN_ENABLE:
+      rgb_matrix_enable();
+      break;
+  }
+}
 
-#if defined(ENCODER_MAP_ENABLE)
-const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-    { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
-    { ENCODER_CCW_CW(KC_VOLD, KC_VOLU), ENCODER_CCW_CW(KC_PGUP, KC_PGDN) },
-};
-#endif
+void encoder_rgb_down(void) {
+  switch (current_selection) {
+    case EN_HUE:
+      rgb_matrix_decrease_hue();
+      break;
+    case EN_SAT:
+      rgb_matrix_decrease_sat();
+      break;
+    case EN_VAL:
+      rgb_matrix_decrease_val();
+      break;
+    case EN_SPEED:
+      rgb_matrix_decrease_speed();
+      break;
+    case EN_MODE:
+      rgb_matrix_step_reverse();
+      break;
+    case EN_ENABLE:
+      rgb_matrix_disable();
+      break;
+  }
+}
+
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    if (index == 0) {
+        if (clockwise) {
+            tap_code(KC_VOLU);
+        } else {
+            tap_code(KC_VOLD);
+        }
+    } else if (index == 1) {
+        if (clockwise) {
+            encoder_rgb_up();
+        } else {
+            encoder_rgb_down();
+        }
+    }
+    return false;
+}
