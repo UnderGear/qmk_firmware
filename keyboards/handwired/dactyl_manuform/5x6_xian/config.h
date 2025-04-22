@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SPLIT_OLED_ENABLE
 #define OLED_IC OLED_IC_SSD1306
 #define OLED_BRIGHTNESS 255
+#define OLED_TIMEOUT 0
 
 #define BOOTMAGIC_ROW 0
 #define BOOTMAGIC_COLUMN 0

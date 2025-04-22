@@ -1,29 +1,37 @@
 #include QMK_KEYBOARD_H
 
+#include "RTC.h"
+
 #define _DEFAULT 0
 #define _LOWER 1
 #define _RAISE 2
 
-#define RAISE MO(_RAISE)
-#define LOWER MO(_LOWER)
 #define DEFAULT MO(_DEFAULT)
+#define LOWER MO(_LOWER)
+#define RAISE MO(_RAISE)
 
 enum custom_keycodes
 {
-    KC_PRWD = SAFE_RANGE,
-    KC_NXWD,
-    KC_DLIN,
-    RM_RSET,
-    RM_SPUE,
-    RM_SPDE,
-    RM_HUUE,
-    RM_HUDE,
-    RM_SAUE,
-    RM_SADE,
-    RM_VAUE,
-    RM_VADE,
-    RM_PRVE,
-    RM_NXTE
+    KC_PRWD = SAFE_RANGE, // previous word
+    KC_NXWD, // next word
+    KC_DLIN, // delete line
+    RM_RSET, // matrix color reset
+    RM_SPUE, // speed up / RTC month up
+    RM_SPDE, // speed down / RTC month down
+    RM_HUUE, // hue up / RTC day of month up
+    RM_HUDE, // hue down / RTC day of month down
+    RM_SAUE, // saturation up / RTC hour up
+    RM_SADE, // saturation down / RTC hour down
+    RM_VAUE, // value up / RTC minute up
+    RM_VADE, // value down / RTC minute down
+    RM_PRVE, // previous color mode / RTC day of week down
+    RM_NXTE, // next color mode / RTC day of week up
+    RM_SCOL, // modify colors
+    RM_SRTC, // modify RTC
+    RM_RTYU, // RTC year up
+    RM_RTYD, // RTC year down
+    RM_RTSU, // RTC second up
+    RM_RTSD // RTC second down
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
@@ -44,10 +52,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
   [_LOWER] = LAYOUT_5x6( //right hand is a numpad, left hand modifies RGB matrix
 
     XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_CIRC,KC_PERC,KC_PSLS,KC_PAST,KC_PEQL,KC_LABK,
-    XXXXXXX,RM_SPUE,RM_HUUE,RM_SAUE,RM_VAUE,XXXXXXX,                        KC_PIPE, KC_P7 , KC_P8 , KC_P9 ,KC_PMNS,KC_RABK,
-    XXXXXXX,RM_SPDE,RM_HUDE,RM_SADE,RM_VADE,XXXXXXX,                        KC_AMPR, KC_P4 , KC_P5 , KC_P6 ,KC_PPLS,KC_LPRN,
+    RM_RTYU,RM_SPUE,RM_HUUE,RM_SAUE,RM_VAUE,RM_RTSU,                        KC_PIPE, KC_P7 , KC_P8 , KC_P9 ,KC_PMNS,KC_RABK,
+    RM_RTYD,RM_SPDE,RM_HUDE,RM_SADE,RM_VADE,RM_RTSD,                        KC_AMPR, KC_P4 , KC_P5 , KC_P6 ,KC_PPLS,KC_LPRN,
     XXXXXXX,RM_RSET,RM_TOGG,RM_PRVE,RM_NXTE,XXXXXXX,                        KC_EXLM, KC_P1 , KC_P2 , KC_P3 ,KC_PENT,KC_RPRN,
-                    XXXXXXX,XXXXXXX,                                                         KC_P0 ,KC_PDOT, 
+                    RM_SCOL,RM_SRTC,                                                         KC_P0 ,KC_PDOT,
                                     XXXXXXX,XXXXXXX,                        XXXXXXX,_______,
                                             XXXXXXX,XXXXXXX,        XXXXXXX,XXXXXXX,
                                             XXXXXXX,XXXXXXX,        XXXXXXX,XXXXXXX
@@ -63,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
                                     _______,XXXXXXX,                      XXXXXXX,XXXXXXX,
                                             XXXXXXX,XXXXXXX,      XXXXXXX,XXXXXXX,
                                             XXXXXXX,XXXXXXX,      XXXXXXX,XXXXXXX
-  )
+  ),
 };
 
 void rgb_reset(void)
@@ -72,6 +80,8 @@ void rgb_reset(void)
     rgb_matrix_set_speed(45);
     rgb_matrix_sethsv(HSV_RED);
 }
+
+bool mode_color = true;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
@@ -197,67 +207,200 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
         case RM_RSET:
             if (record->event.pressed)
             {
-                rgb_reset();
+                if (mode_color)
+                {
+                    rgb_reset();
+                }
             }
             return false;
         case RM_SPUE:
             if (record->event.pressed)
             {
-                rgb_matrix_increase_speed();
+                if (mode_color)
+                {
+                    rgb_matrix_increase_speed();
+                }
+                else
+                {
+                    increment_month();
+                }
             }
             return false;
         case RM_SPDE:
             if (record->event.pressed)
             {
-                rgb_matrix_decrease_speed();
+                if (mode_color)
+                {
+                    rgb_matrix_decrease_speed();
+                }
+                else
+                {
+                    decrement_month();
+                }
             }
             return false;
         case RM_HUUE:
             if (record->event.pressed)
             {
-                rgb_matrix_increase_hue();
+                if (mode_color)
+                {
+                    rgb_matrix_increase_hue();
+                }
+                else
+                {
+                    increment_day_of_month();
+                }
             }
             return false;
         case RM_HUDE:
             if (record->event.pressed)
             {
-                rgb_matrix_decrease_hue();
+                if (mode_color)
+                {
+                    rgb_matrix_decrease_hue();
+                }
+                else
+                {
+                    decrement_day_of_month();
+                }
             }
             return false;
         case RM_SAUE:
             if (record->event.pressed)
             {
-                rgb_matrix_increase_sat();
+                if (mode_color)
+                {
+                    rgb_matrix_increase_sat();
+                }
+                else
+                {
+                    increment_hours();
+                }
             }
             return false;
         case RM_SADE:
             if (record->event.pressed)
             {
-                rgb_matrix_decrease_sat();
+                if (mode_color)
+                {
+                    rgb_matrix_decrease_sat();
+                }
+                else
+                {
+                    decrement_hours();
+                }
             }
             return false;
         case RM_VAUE:
             if (record->event.pressed)
             {
-                rgb_matrix_increase_val();
+                if (mode_color)
+                {
+                    rgb_matrix_increase_val();
+                }
+                else
+                {
+                    increment_minutes();
+                }
             }
             return false;
         case RM_VADE:
             if (record->event.pressed)
             {
-                rgb_matrix_decrease_val();
+                if (mode_color)
+                {
+                    rgb_matrix_decrease_val();
+                }
+                else
+                {
+                    decrement_minutes();
+                }
             }
             return false;
         case RM_PRVE:
             if (record->event.pressed)
             {
-                rgb_matrix_step_reverse();
+                if (mode_color)
+                {
+                    rgb_matrix_step_reverse();
+                }
+                else
+                {
+                    decrement_day_of_week();
+                }
             }
             return false;
         case RM_NXTE:
             if (record->event.pressed)
             {
-                rgb_matrix_step();
+                if (mode_color)
+                {
+                    rgb_matrix_step();
+                }
+                else
+                {
+                    increment_day_of_week();
+                }
+            }
+            return false;
+        case RM_RTYU:
+            if (record->event.pressed)
+            {
+                if (mode_color)
+                {
+                }
+                else
+                {
+                    increment_year();
+                }
+            }
+            return false;
+        case RM_RTYD:
+            if (record->event.pressed)
+            {
+                if (mode_color)
+                {
+                }
+                else
+                {
+                    decrement_year();
+                }
+            }
+            return false;
+        case RM_RTSU:
+            if (record->event.pressed)
+            {
+                if (mode_color)
+                {
+                }
+                else
+                {
+                    increment_seconds();
+                }
+            }
+            return false;
+        case RM_RTSD:
+            if (record->event.pressed)
+            {
+                if (mode_color)
+                {
+                }
+                else
+                {
+                    decrement_seconds();
+                }
+            }
+            return false;
+        case RM_SCOL:
+            if (record->event.pressed)
+            {
+                mode_color = true;
+            }
+            return false;
+        case RM_SRTC:
+            if (record->event.pressed)
+            {
+                mode_color = false;
             }
             return false;
     }
@@ -266,13 +409,104 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 
 #ifdef OLED_ENABLE
 
+const char *get_u8_str_2(uint8_t curr_num, char curr_pad)
+{
+    static char    buf[3]   = {0};
+    static uint8_t last_num = 0xFF;
+    static char    last_pad = '\0';
+    if (last_num == curr_num && last_pad == curr_pad) {
+        return buf;
+    }
+    last_num = curr_num;
+    last_pad = curr_pad;
+    return get_numeric_str(buf, sizeof(buf), curr_num, curr_pad);
+}
+
 static void print_layer_status(void)
 {
+    i2c_status_t read_status = read_rtc();
+    if (read_status == I2C_STATUS_SUCCESS)
+    {
+        oled_write(get_u8_str_2(current_time.hours, '0'), false);
+        oled_write_P(PSTR(":"), false);
+        oled_write_ln(get_u8_str_2(current_time.minutes, '0'), false);
+
+        switch(current_time.day_of_week)
+        {
+            case 0:
+                oled_write_ln_P(PSTR("Sun"), false);
+                break;
+            case 1:
+                oled_write_ln_P(PSTR("Mon"), false);
+                break;
+            case 2:
+                oled_write_ln_P(PSTR("Tue"), false);
+                break;
+            case 3:
+                oled_write_ln_P(PSTR("Wed"), false);
+                break;
+            case 4:
+                oled_write_ln_P(PSTR("Thu"), false);
+                break;
+            case 5:
+                oled_write_ln_P(PSTR("Fri"), false);
+                break;
+            case 6:
+                oled_write_ln_P(PSTR("Sat"), false);
+                break;
+        }
+
+        switch(current_time.month)
+        {
+            case 0:
+                oled_write_P(PSTR("Jan"), false);
+                break;
+            case 1:
+                oled_write_P(PSTR("Feb"), false);
+                break;
+            case 2:
+                oled_write_P(PSTR("Mar"), false);
+                break;
+            case 3:
+                oled_write_P(PSTR("Apr"), false);
+                break;
+            case 4:
+                oled_write_P(PSTR("May"), false);
+                break;
+            case 5:
+                oled_write_P(PSTR("Jun"), false);
+                break;
+            case 6:
+                oled_write_P(PSTR("Jul"), false);
+                break;
+            case 7:
+                oled_write_P(PSTR("Aug"), false);
+                break;
+            case 8:
+                oled_write_P(PSTR("Sep"), false);
+                break;
+            case 9:
+                oled_write_P(PSTR("Oct"), false);
+                break;
+            case 10:
+                oled_write_P(PSTR("Nov"), false);
+                break;
+            case 11:
+                oled_write_P(PSTR("Dec"), false);
+                break;
+        }
+        oled_write_ln(get_u8_str_2(current_time.day_of_month, '0'), false);
+        oled_write_ln(get_u16_str(current_time.year, ' '), false);
+    }
+    else
+    {
+        oled_write_ln_P(PSTR("\n"), false);
+        oled_write_ln_P(PSTR("\n"), false);
+        oled_write_ln_P(PSTR("\n"), false);
+        oled_write_ln_P(PSTR("\n"), false);
+    }
+    oled_write_ln_P(PSTR("\n"), false);
     oled_write_ln_P(PSTR("Xian"), false);
-    oled_write_ln_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR("\n"), false);
     oled_write_ln_P(PSTR("\n"), false);
 
     oled_write_ln_P(PSTR("Layer"), false);
@@ -283,11 +517,18 @@ static void print_layer_status(void)
     }
     else if (IS_LAYER_ON(_RAISE))
     {
-        oled_write_ln_P(PSTR("Raise"), false);
+        oled_write_ln_P(PSTR("Nav"), false);
     }
     else if (IS_LAYER_ON(_LOWER))
     {
-        oled_write_ln_P(PSTR("Lower"), false);
+        if (mode_color)
+        {
+            oled_write_ln_P(PSTR("Color"), false);
+        }
+        else
+        {
+            oled_write_ln_P(PSTR("Time"), false);
+        }
     }
 }
 
@@ -302,9 +543,7 @@ static void print_rgb_status(void)
     oled_write_P(PSTR("V "), false);
     oled_write_ln(get_u8_str(rgb_matrix_get_val(), ' '), false);
 
-    oled_write_ln_P(PSTR("\n"), false);
-    oled_write_ln_P(PSTR("Speed"), false);
-    oled_write_P(PSTR("  "), false); //align speed value to the right of the OLED
+    oled_write_P(PSTR("Sp"), false);
     oled_write_ln(get_u8_str(rgb_matrix_get_speed(), ' '), false);
 
     oled_write_ln_P(PSTR("Mode"), false);
@@ -327,10 +566,26 @@ static void print_rgb_status(void)
     {
         oled_write_ln_P(PSTR("Off"), false);
     }
+
+    oled_write_ln_P(PSTR("Layer"), false);
+
+    if (IS_LAYER_ON(_DEFAULT))
+    {
+        oled_write_ln_P(PSTR("Main"), false);
+    }
+    else if (IS_LAYER_ON(_RAISE))
+    {
+        oled_write_ln_P(PSTR("Media"), false);
+    }
+    else if (IS_LAYER_ON(_LOWER))
+    {
+        oled_write_ln_P(PSTR("Num"), false);
+    }
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation)
 {
+    rtc_init();
     return OLED_ROTATION_270;
 }
 
@@ -345,11 +600,6 @@ bool oled_task_user(void)
         print_rgb_status();
     }
     return false;
-}
-
-void suspend_power_down_user(void)
-{
-    oled_off();
 }
 
 #endif
