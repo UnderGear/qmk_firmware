@@ -54,7 +54,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] =
     XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,XXXXXXX,                        KC_CIRC,KC_PERC,KC_PSLS,KC_PAST,KC_PEQL,KC_LABK,
     RM_RTYU,RM_SPUE,RM_HUUE,RM_SAUE,RM_VAUE,RM_RTSU,                        KC_PIPE, KC_P7 , KC_P8 , KC_P9 ,KC_PMNS,KC_RABK,
     RM_RTYD,RM_SPDE,RM_HUDE,RM_SADE,RM_VADE,RM_RTSD,                        KC_AMPR, KC_P4 , KC_P5 , KC_P6 ,KC_PPLS,KC_LPRN,
-    XXXXXXX,RM_RSET,RM_TOGG,RM_PRVE,RM_NXTE,XXXXXXX,                        KC_EXLM, KC_P1 , KC_P2 , KC_P3 ,KC_PENT,KC_RPRN,
+     KC_NUM,RM_RSET,RM_TOGG,RM_PRVE,RM_NXTE,XXXXXXX,                        KC_EXLM, KC_P1 , KC_P2 , KC_P3 ,KC_PENT,KC_RPRN,
                     RM_SCOL,RM_SRTC,                                                         KC_P0 ,KC_PDOT,
                                     XXXXXXX,XXXXXXX,                        XXXXXXX,_______,
                                             XXXXXXX,XXXXXXX,        XXXXXXX,XXXXXXX,
